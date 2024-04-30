@@ -1,0 +1,16 @@
+async-timeout==4.0.3
+asyncpg==0.29.0
+flake8==7.0.0
+greenlet==3.0.3
+isort==5.13.2
+mccabe==0.7.0
+pyaes==1.6.1
+pycodestyle==2.11.1
+pyflakes==3.2.0
+Pyrogram==2.0.106
+PySocks==1.7.1
+python-dotenv==1.0.1
+pytz==2024.1
+SQLAlchemy==2.0.29
+TgCrypto==1.2.5
+typing_extensions==4.11.0
