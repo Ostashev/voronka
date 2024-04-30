@@ -127,8 +127,7 @@ async def process_message(client: Client, message: Message) -> None:
                     user.status_message_sending = True
                     await session.commit()
                     await session.refresh(user)
-                    await asyncio.sleep(10 - (datetime.utcnow() - user.date_first_message).total_seconds())
-                    # await asyncio.sleep(360 - (datetime.utcnow() - user.date_first_message).total_seconds())
+                    await asyncio.sleep(360 - (datetime.utcnow() - user.date_first_message).total_seconds())
                     user = await send_message(user, TEXT_1, 1)
 
                 else:
@@ -149,12 +148,6 @@ async def process_message(client: Client, message: Message) -> None:
                     and user.status_trigger is False
                     and user.status_message_sending is False
             ):
-                # if TRIGGER.lower() in TEXT_2.lower():
-                #     user.status_trigger = True
-                #     user.date_status_trigger = datetime.utcnow()
-                #     await session.commit()
-                #     await session.refresh(user)
-                    # break
                 if (
                         'прекрасно' not in TEXT_2.lower()
                         and 'ожидать' not in TEXT_2.lower()
@@ -162,8 +155,7 @@ async def process_message(client: Client, message: Message) -> None:
                     user.status_message_sending = True
                     await session.commit()
                     await session.refresh(user)
-                    # await asyncio.sleep(2340 - (datetime.utcnow() - user.date_message_sending).total_seconds())
-                    await asyncio.sleep(10 - (datetime.utcnow() - user.date_message_sending).total_seconds())
+                    await asyncio.sleep(2340 - (datetime.utcnow() - user.date_message_sending).total_seconds())
                     user = await send_message(user, TEXT_2, 2)
 
                 else:
@@ -186,8 +178,7 @@ async def process_message(client: Client, message: Message) -> None:
                     timesleep = (
                             datetime.utcnow() - user.date_status_trigger).total_seconds() if user.status_trigger else (
                             datetime.utcnow() - user.date_message_sending).total_seconds()
-                    # await asyncio.sleep(93600 - timesleep)
-                    await asyncio.sleep(10 - timesleep)
+                    await asyncio.sleep(93600 - timesleep)
                     user = await send_message(user, TEXT_3, 3)
                 else:
                     user = await finish(user)
