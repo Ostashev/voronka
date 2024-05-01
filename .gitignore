@@ -4,3 +4,6 @@
 venv/
 __pycache__/
 .vscode/
+my_account.session
+voronka.session
+voronka.session-journal

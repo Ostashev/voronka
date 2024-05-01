@@ -67,7 +67,11 @@ async def send_message(user: User, text: str, message_sending: int) -> User:
         user.date_message_sending = datetime.utcnow()
         user.message_sending = message_sending
         user.status_message_sending = False
+        if message_sending == 3:
+            user.status = 'finished'
         logging.info("Сообщение №%s отправлено", message_sending)
+        if message_sending == 3:
+            logging.info("Для пользователя №%s воронка окончена", user.id)
         return user
     except BadRequest:
         user.status = 'dead'
@@ -119,15 +123,13 @@ async def process_message(client: Client, message: Message) -> None:
                     and user.status_message_sending is False
             ):
                 user.date_first_message = datetime.utcnow()
+                user.status_message_sending = True
                 await session.commit()
                 await session.refresh(user)
 
+                await asyncio.sleep(360 - (datetime.utcnow() - user.date_first_message).total_seconds())
                 if ('прекрасно' not in TEXT_1.lower()
                         and 'ожидать' not in TEXT_1.lower()):
-                    user.status_message_sending = True
-                    await session.commit()
-                    await session.refresh(user)
-                    await asyncio.sleep(360 - (datetime.utcnow() - user.date_first_message).total_seconds())
                     user = await send_message(user, TEXT_1, 1)
 
                 else:
@@ -135,27 +137,25 @@ async def process_message(client: Client, message: Message) -> None:
                 await session.commit()
                 await session.refresh(user)
 
-            if TRIGGER.lower() in TEXT_2.lower():
-                user.status_trigger = True
-                user.date_status_trigger = datetime.utcnow()
-                await session.commit()
-                await session.refresh(user)
-                logging.info("Для пользователя №%s получен триггер", user.id)
-
             if (
                     user.status == 'alive'
                     and user.message_sending == 1
                     and user.status_trigger is False
                     and user.status_message_sending is False
             ):
-                if (
+                user.status_message_sending = True
+                await session.commit()
+                await session.refresh(user)
+                await asyncio.sleep(2340 - (datetime.utcnow() - user.date_message_sending).total_seconds())
+                if TRIGGER.lower() in TEXT_2.lower():
+                    user.status_trigger = True
+                    user.date_status_trigger = datetime.utcnow()
+                    user.status_message_sending = False
+                    logging.info("Для пользователя №%s получен триггер", user.id)
+                elif (
                         'прекрасно' not in TEXT_2.lower()
                         and 'ожидать' not in TEXT_2.lower()
                 ):
-                    user.status_message_sending = True
-                    await session.commit()
-                    await session.refresh(user)
-                    await asyncio.sleep(2340 - (datetime.utcnow() - user.date_message_sending).total_seconds())
                     user = await send_message(user, TEXT_2, 2)
 
                 else:
@@ -168,17 +168,17 @@ async def process_message(client: Client, message: Message) -> None:
                     and (user.message_sending == 2 or user.message_sending == 1)
                     and user.status_message_sending is False
             ):
+                user.status_message_sending = True
+                await session.commit()
+                await session.refresh(user)
+                timesleep = (
+                        datetime.utcnow() - user.date_status_trigger).total_seconds() if user.status_trigger else (
+                        datetime.utcnow() - user.date_message_sending).total_seconds()
+                await asyncio.sleep(93600 - timesleep)
                 if (
                         'прекрасно' not in TEXT_3.lower()
                         and 'ожидать' not in TEXT_3.lower()
                 ):
-                    user.status_message_sending = True
-                    await session.commit()
-                    await session.refresh(user)
-                    timesleep = (
-                            datetime.utcnow() - user.date_status_trigger).total_seconds() if user.status_trigger else (
-                            datetime.utcnow() - user.date_message_sending).total_seconds()
-                    await asyncio.sleep(93600 - timesleep)
                     user = await send_message(user, TEXT_3, 3)
                 else:
                     user = await finish(user)
